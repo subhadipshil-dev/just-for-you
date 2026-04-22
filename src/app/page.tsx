@@ -611,7 +611,7 @@ export default function Home() {
             Developed with <Heart className="w-3 h-3 text-rose-500 fill-rose-500" /> by Subhadip Shil
           </p>
           <p className="text-[8px] uppercase tracking-[0.2em] font-bold text-zinc-300 dark:text-zinc-700">
-            © 2024 Just For You
+            © 2026 Just For You
           </p>
         </div>
       </footer>

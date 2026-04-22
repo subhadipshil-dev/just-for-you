@@ -25,4 +25,4 @@ An interactive, premium surprise platform designed to create personalized, anima
 - Email: subhadipshil.dev@gmail.com
 
 ---
-© 2024 Just For You
+© 2026 Just For You
