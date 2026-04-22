@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
+import { useTheme } from '@/components/ThemeContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Heart, Clock, AlertCircle, Home } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
@@ -28,6 +29,7 @@ const SUCCESS_GIF = "https://media1.tenor.com/m/O9P6oHeJ5MwAAAAC/dog-smile.gif";
 
 export default function ReceiverPage() {
   const { id } = useParams();
+  const { theme: globalTheme } = useTheme();
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
