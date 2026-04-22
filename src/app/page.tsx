@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
+import { useTheme } from '@/components/ThemeContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Heart, Sparkles, Send, Eye, ArrowLeft, Settings2, Palette, Copy, Check, ExternalLink, Moon, Sun, Github, Linkedin, Mail } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
@@ -41,6 +42,7 @@ const itemVariants = {
 };
 
 export default function Home() {
+  const { theme: globalTheme } = useTheme();
   const [step, setStep] = useState<'form' | 'preview' | 'success'>('form');
   const [mode, setMode] = useState<'default' | 'advanced'>('default');
   const [experienceType, setExperienceType] = useState<'fun' | 'serious'>('fun');
@@ -381,10 +383,12 @@ export default function Home() {
 
             <div className={cn(
               "w-full min-h-[500px] rounded-[2rem] shadow-xl relative flex flex-col items-center justify-center p-8 transition-all duration-500",
-              theme === 'cute' && "bg-pink-50",
+              globalTheme === 'dark' ? "bg-zinc-950 text-white" : "bg-white text-zinc-900",
+              theme === 'cute' && (globalTheme === 'dark' ? "bg-[#1a0f12] text-rose-100" : "bg-pink-50 text-zinc-900"),
               theme === 'dark' && "bg-zinc-950 text-white",
-              theme === 'minimal' && "bg-white border border-zinc-100",
-              theme === 'gradient' && "bg-gradient-to-br from-indigo-50 via-white to-rose-50"
+              theme === 'gradient' && (globalTheme === 'dark' 
+                ? "bg-gradient-to-br from-indigo-950 via-zinc-950 to-rose-950 text-zinc-100" 
+                : "bg-gradient-to-br from-indigo-50 via-white to-rose-50 text-zinc-900")
             )}>
               {/* Preview Indicator */}
               <div className="absolute top-6 right-6 px-4 py-1.5 bg-black/5 dark:bg-white/5 backdrop-blur-md rounded-full text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 z-50 pointer-events-none">
