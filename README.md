@@ -15,19 +15,6 @@ An interactive, premium surprise platform where you can create personalized, ani
 - Node.js 18+
 - npm or yarn
 
-### Installation
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/subhadipshil-dev/just-for-you.git
-   ```
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-3. Start the development server:
-   ```bash
-   npm run dev
-   ```
 
 ## 🛠️ Built With
 - **Next.js** (App Router)
