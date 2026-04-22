@@ -1,23 +1,18 @@
 # Just For You 💖
 
-An interactive, premium surprise platform where you can create personalized, animated messages for your special someone.
+An interactive, premium surprise platform designed to create personalized, animated messages for your special someone.
 
-## ✨ Features
-- **Experience Modes**: Choose between **Fun (Repelling)** and **Serious (Normal)** interactions.
-- **Dynamic Reactions**: A sequence of 8 custom GIF reactions that play as the receiver tries to click "No".
-- **Repelling Logic**: In "Fun" mode, the "No" button teleports rapidly after the 8th attempt, making it nearly unclickable!
-- **Minimalist Premium Design**: Sleek, glassmorphic UI with Dark/Light mode support.
-- **Responsive & Compact**: Optimized for all screen sizes with a clean, single-page feel.
+### 🌐 [Live Demo: justforyouonly.vercel.app](https://justforyouonly.vercel.app/)
 
-## 🚀 Getting Started
-
-### Prerequisites
-- Node.js 18+
-- npm or yarn
-
+## ✨ Key Features
+- **Dynamic Interaction Modes**: Choose between **Fun (Repelling)** and **Serious (Normal)** experiences.
+- **8-Level Emotional Sequence**: Custom GIF reactions that play dynamically as the receiver interacts with the page.
+- **Playful Repelling Logic**: In "Fun" mode, the "No" button becomes nearly unclickable after the initial sequence, ensuring a "YES!" is the final destination.
+- **Premium Dark/Light UI**: A sleek, glassmorphic design that adapts to the user's system theme or manual preference.
+- **One-Page Elegance**: A compact, responsive layout optimized for mobile and desktop alike.
 
 ## 🛠️ Built With
-- **Next.js** (App Router)
+- **Next.js 15** (App Router)
 - **Tailwind CSS v4**
 - **Framer Motion** (Animations)
 - **Lucide React** (Icons)
@@ -31,6 +26,3 @@ An interactive, premium surprise platform where you can create personalized, ani
 
 ---
 © 2024 Just For You
-<<<<<<< HEAD
-=======
->>>>>>> origin/main
