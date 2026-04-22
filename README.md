@@ -30,7 +30,7 @@ An interactive, premium surprise platform where you can create personalized, ani
 - Email: subhadipshil.dev@gmail.com
 
 ---
-© 2024 Just For You
+© 2026 Just For You
 <<<<<<< HEAD
 =======
 >>>>>>> origin/main
