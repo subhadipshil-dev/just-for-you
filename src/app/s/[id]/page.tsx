@@ -123,10 +123,10 @@ export default function ReceiverPage() {
   return (
     <main className={cn(
       "min-h-screen flex flex-col items-center justify-center p-6 relative transition-colors duration-500",
-      data.theme === 'cute' && "bg-pink-50",
-      data.theme === 'dark' && "bg-black text-white",
-      data.theme === 'minimal' && "bg-white",
-      data.theme === 'gradient' && "bg-gradient-to-br from-indigo-50 via-white to-rose-50"
+      data.theme === 'cute' && "bg-pink-50 dark:bg-[#1a0f12] text-zinc-900 dark:text-rose-100",
+      data.theme === 'dark' && "bg-zinc-950 text-white",
+      data.theme === 'minimal' && "bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100",
+      data.theme === 'gradient' && "bg-gradient-to-br from-indigo-50 via-white to-rose-50 dark:from-indigo-950 dark:via-zinc-950 dark:to-rose-950 text-zinc-900 dark:text-zinc-100"
     )}>
       <div className="absolute top-8 px-4 py-2 bg-black/5 dark:bg-white/5 backdrop-blur-md rounded-full text-[11px] font-bold tracking-widest uppercase flex items-center gap-2">
         <Clock className="w-3 h-3" /> Expiry: {timeLeft}
@@ -158,7 +158,7 @@ export default function ReceiverPage() {
               )}
             </div>
             <div className="space-y-2">
-              <h1 className="text-4xl font-bold tracking-tight">Hey {data.receiverName}!</h1>
+              <h1 className="text-4xl font-bold tracking-tight text-inherit">Hey {data.receiverName}!</h1>
               <p className="text-xl text-zinc-500 dark:text-zinc-400 font-medium italic">
                 {noCount > 0 ? currentReaction?.message : (data.customMessage || 'I have a question for you...')}
               </p>

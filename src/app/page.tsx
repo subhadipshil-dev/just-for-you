@@ -381,10 +381,10 @@ export default function Home() {
 
             <div className={cn(
               "w-full min-h-[500px] rounded-[2rem] shadow-xl relative flex flex-col items-center justify-center p-8 transition-all duration-500",
-              theme === 'cute' && "bg-pink-50",
+              theme === 'cute' && "bg-pink-50 dark:bg-[#1a0f12] text-zinc-900 dark:text-rose-100",
               theme === 'dark' && "bg-zinc-950 text-white",
-              theme === 'minimal' && "bg-white border border-zinc-100",
-              theme === 'gradient' && "bg-gradient-to-br from-indigo-50 via-white to-rose-50"
+              theme === 'minimal' && "bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100",
+              theme === 'gradient' && "bg-gradient-to-br from-indigo-50 via-white to-rose-50 dark:from-indigo-950 dark:via-zinc-950 dark:to-rose-950 text-zinc-900 dark:text-zinc-100"
             )}>
               {/* Preview Indicator */}
               <div className="absolute top-6 right-6 px-4 py-1.5 bg-black/5 dark:bg-white/5 backdrop-blur-md rounded-full text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 z-50 pointer-events-none">
@@ -430,7 +430,7 @@ export default function Home() {
                     </div>
 
                     <div className="space-y-4 px-6">
-                      <h2 className="text-4xl sm:text-7xl font-black tracking-tight leading-none">
+                      <h2 className="text-4xl sm:text-7xl font-black tracking-tight leading-none text-inherit">
                         Hey <span className="text-rose-500">{formData.receiverName || 'Sarah'}</span>!
                       </h2>
                       <p className="text-xl sm:text-2xl text-zinc-500 dark:text-zinc-400 font-medium italic min-h-[4rem] flex items-center justify-center">
