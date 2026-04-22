@@ -5,7 +5,7 @@ import { saveSurprise } from '@/lib/storage';
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { receiverName, senderName, customMessage, theme, mode } = body;
+    const { receiverName, senderName, customMessage, theme, mode, experienceType } = body;
 
     if (!receiverName) {
       return NextResponse.json(
@@ -24,6 +24,7 @@ export async function POST(req: NextRequest) {
       customMessage,
       theme: theme || 'cute',
       mode: mode || 'default',
+      experienceType: experienceType || 'fun',
       expiresAt,
     };
 
