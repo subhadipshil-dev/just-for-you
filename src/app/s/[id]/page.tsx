@@ -4,11 +4,12 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import { useTheme } from '@/components/ThemeContext';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Heart, Clock, AlertCircle, Home, Download, X } from 'lucide-react';
+import { Heart, Clock, AlertCircle, Home, Download, X, Camera } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import confetti from 'canvas-confetti';
 import Link from 'next/link';
+import { toPng } from 'html-to-image';
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -28,7 +29,7 @@ const REPEL_GIF = "https://media1.tenor.com/m/zmyMkoQ_YoUAAAAC/scared-dog.gif";
 
 export default function ReceiverPage() {
   const { id } = useParams();
-  const { theme: globalTheme } = useTheme();
+  const { theme: globalTheme, setTheme } = useTheme();
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -37,6 +38,7 @@ export default function ReceiverPage() {
   const [noCount, setNoCount] = useState(0);
   const [acceptedStep, setAcceptedStep] = useState(0);
   const [enteredName, setEnteredName] = useState("");
+  const [mounted, setMounted] = useState(false);
   const certificateRef = useRef<HTMLDivElement>(null);
   const [noButtonPosition, setNoButtonPosition] = useState({ x: 0, y: 0 });
   const [isRepelling, setIsRepelling] = useState(false);
@@ -49,6 +51,13 @@ export default function ReceiverPage() {
         if (response.ok) {
           setData(result);
           updateCountdown(result.expiresAt);
+          
+          // Sync global theme with surprise theme if it's explicitly 'dark' or 'cute'
+          if (result.theme === 'dark') {
+            setTheme('dark');
+          } else if (result.theme === 'minimal') {
+            setTheme('light');
+          }
         } else {
           setError(result.error || 'Something went wrong');
         }
@@ -59,6 +68,7 @@ export default function ReceiverPage() {
       }
     };
     fetchData();
+    setMounted(true);
   }, [id]);
 
   const updateCountdown = (expiresAt: string) => {
@@ -100,6 +110,32 @@ export default function ReceiverPage() {
       setNoButtonPosition({ x: randomX, y: randomY });
     }
   };
+  
+  const handleDownload = async () => {
+    if (!certificateRef.current) return;
+    try {
+      setLoading(true);
+      const dataUrl = await toPng(certificateRef.current, {
+        cacheBust: true,
+        backgroundColor: globalTheme === 'dark' ? '#09090b' : '#ffffff',
+        style: {
+          borderRadius: '1.5rem',
+        }
+      });
+      const link = document.createElement('a');
+      const safeId = typeof id === 'string' ? id : 'surprise';
+      link.download = `certificate-${safeId}.png`;
+      link.href = dataUrl;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (err) {
+      console.error('Download failed', err);
+      alert('Failed to generate image. You can still use Save as PDF (Ctrl+P)');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -135,7 +171,7 @@ export default function ReceiverPage() {
       "print:bg-white print:text-black print:p-0 print:min-h-0 print:block"
     )}>
       <div className="absolute top-8 px-4 py-2 bg-black/5 dark:bg-white/5 backdrop-blur-md rounded-full text-[11px] font-bold tracking-widest uppercase flex items-center gap-2 print:hidden">
-        <Clock className="w-3 h-3" /> Expiry: {timeLeft}
+        <Clock className="w-3 h-3" /> Expiry: {timeLeft || 'Calculating...'}
       </div>
 
       <div className="w-full max-w-md flex flex-col items-center z-10 print:max-w-none print:w-auto">
@@ -178,13 +214,13 @@ export default function ReceiverPage() {
                 </div>
                 <div className="flex items-center justify-center gap-6 pt-4">
                   <motion.button
-                    animate={{ scale: 1 }}
+                    animate={{ scale: 1 + noCount * 0.1 }}
                     onClick={() => {
                       setAcceptedStep(1);
                       confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
                       setTimeout(() => setAcceptedStep(2), 2500);
                     }}
-                    className="px-12 py-5 bg-rose-500 text-white rounded-2xl font-bold text-2xl shadow-lg z-10"
+                    className="px-12 py-5 bg-rose-500 text-white rounded-2xl font-bold text-2xl shadow-lg z-50"
                   >
                     YES!
                   </motion.button>
@@ -203,7 +239,7 @@ export default function ReceiverPage() {
                     onMouseEnter={data.experienceType === 'fun' ? handleNoHover : undefined}
                     onClick={handleNoClick}
                     className={cn(
-                      "px-12 py-5 bg-red-600 text-white rounded-2xl font-bold text-2xl transition-all z-50 shadow-xl cursor-pointer",
+                      "px-12 py-5 bg-red-600 text-white rounded-2xl font-bold text-2xl transition-all z-10 shadow-xl cursor-pointer",
                       isRepelling && data.experienceType === 'fun' && "opacity-90"
                     )}
                   >
@@ -297,8 +333,9 @@ export default function ReceiverPage() {
                       <div className="flex justify-between items-end pt-4">
                         <div>
                           <span className="block text-[10px] text-zinc-400 font-bold uppercase tracking-widest mb-1">Date</span>
-                          <div className="font-mono text-xs sm:text-sm font-semibold text-rose-500">
-                            {new Date().toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' })}
+                          <div className="font-mono text-xs sm:text-sm font-semibold text-rose-500" suppressHydrationWarning>
+                            {mounted ? new Date().toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }) : '--/--/----'}
+                            {mounted && <span className="ml-2 opacity-50">{new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</span>}
                           </div>
                         </div>
                         <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 border-rose-200 flex items-center justify-center opacity-50">
@@ -311,10 +348,11 @@ export default function ReceiverPage() {
 
                 <div className="flex flex-col sm:flex-row gap-3 mt-8 w-full max-w-[380px] print:hidden">
                   <button 
-                    onClick={() => window.print()}
-                    className="flex-1 flex items-center justify-center gap-2 py-4 bg-rose-500 hover:bg-rose-600 text-white rounded-2xl font-bold shadow-lg shadow-rose-500/20 transition-all active:scale-95"
+                    onClick={handleDownload}
+                    className="flex-1 flex items-center justify-center gap-2 py-4 bg-rose-500 hover:bg-rose-600 text-white rounded-2xl font-bold shadow-lg shadow-rose-500/20 transition-all active:scale-95 disabled:opacity-50"
+                    disabled={loading}
                   >
-                    <Download className="w-5 h-5" /> Save as PDF
+                    <Camera className="w-5 h-5" /> {loading ? 'Saving...' : 'Save as Image'}
                   </button>
                   <Link 
                     href="/" 

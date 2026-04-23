@@ -447,9 +447,9 @@ export default function Home() {
 
                     <div className="flex flex-wrap items-center justify-center gap-10 pt-4 relative">
                       <motion.button
-                        animate={{ scale: experienceType === 'fun' ? 1 : 1 }} // Growth removed as requested
+                        animate={{ scale: 1 + noCount * 0.1 }}
                         onClick={handleYesClick}
-                        className="px-14 py-6 bg-rose-500 hover:bg-rose-600 text-white rounded-2xl font-black text-3xl shadow-[0_20px_50px_-10px_rgba(244,63,94,0.5)] transition-colors active:scale-95 z-10 whitespace-nowrap"
+                        className="px-14 py-6 bg-rose-500 hover:bg-rose-600 text-white rounded-2xl font-black text-3xl shadow-[0_20px_50px_-10px_rgba(244,63,94,0.5)] transition-colors active:scale-95 z-50 whitespace-nowrap"
                       >
                         YES!
                       </motion.button>
@@ -469,7 +469,7 @@ export default function Home() {
                         onMouseEnter={experienceType === 'fun' ? handleNoHover : undefined}
                         onClick={handleNoClick}
                         className={cn(
-                          "px-14 py-6 bg-red-600 text-white rounded-2xl font-black text-3xl transition-all z-50 shadow-2xl cursor-pointer"
+                          "px-14 py-6 bg-red-600 text-white rounded-2xl font-black text-3xl transition-all z-10 shadow-2xl cursor-pointer"
                         )}
                       >
                         No
