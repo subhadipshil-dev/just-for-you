@@ -113,17 +113,42 @@ export default function ReceiverPage() {
   
   const handleDownload = async () => {
     if (!certificateRef.current) return;
+    const node = certificateRef.current;
+    setLoading(true);
     try {
-      setLoading(true);
-      const dataUrl = await toPng(certificateRef.current, {
+      // Wait for fonts to be fully loaded
+      await document.fonts.ready;
+      
+      // Small delay to ensure all paint is done
+      await new Promise(resolve => setTimeout(resolve, 300));
+
+      // Temporarily disable backdrop-filter (unsupported by html-to-image)
+      const innerPanel = node.querySelector<HTMLElement>('.backdrop-blur-sm');
+      const prevBackdrop = innerPanel?.style.backdropFilter ?? '';
+      const prevWebkitBackdrop = innerPanel?.style.webkitBackdropFilter ?? '';
+      if (innerPanel) {
+        innerPanel.style.backdropFilter = 'none';
+        innerPanel.style.webkitBackdropFilter = 'none';
+        innerPanel.style.backgroundColor = globalTheme === 'dark' ? 'rgba(0,0,0,0.9)' : 'rgba(255,255,255,0.95)';
+      }
+
+      const dataUrl = await toPng(node, {
         cacheBust: true,
-        backgroundColor: globalTheme === 'dark' ? '#09090b' : '#ffffff',
-        style: {
-          borderRadius: '1.5rem',
-        }
+        pixelRatio: 3, // retina-quality
+        width: node.offsetWidth,
+        height: node.offsetHeight,
+        backgroundColor: globalTheme === 'dark' ? '#1a1614' : '#fffaf5',
       });
-      const link = document.createElement('a');
+
+      // Restore styles
+      if (innerPanel) {
+        innerPanel.style.backdropFilter = prevBackdrop;
+        innerPanel.style.webkitBackdropFilter = prevWebkitBackdrop;
+        innerPanel.style.backgroundColor = '';
+      }
+
       const safeId = typeof id === 'string' ? id : 'surprise';
+      const link = document.createElement('a');
       link.download = `certificate-${safeId}.png`;
       link.href = dataUrl;
       document.body.appendChild(link);
@@ -131,7 +156,7 @@ export default function ReceiverPage() {
       document.body.removeChild(link);
     } catch (err) {
       console.error('Download failed', err);
-      alert('Failed to generate image. You can still use Save as PDF (Ctrl+P)');
+      alert('Image capture failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -289,57 +314,140 @@ export default function ReceiverPage() {
             )}
 
             {acceptedStep === 3 && (
-              <motion.div key="step3" initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} className="text-center w-full flex flex-col items-center print:block print:w-auto">
-                <div 
-                  ref={certificateRef} 
-                  className="w-full max-w-[380px] bg-[#fffaf5] dark:bg-[#1a1614] p-6 sm:p-8 relative overflow-hidden text-center shrink-0 print:mx-auto print:max-w-[100%] print:shadow-none print:border-8 print:border-rose-100"
+              <motion.div key="step3" initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} className="text-center w-full flex flex-col items-center">
+                {/* Certificate card - all styles are inline so html-to-image captures them */}
+                <div
+                  ref={certificateRef}
                   style={{
-                    boxShadow: "0 25px 50px -12px rgba(225, 29, 72, 0.25)",
-                    borderRadius: "1.5rem",
-                    border: "8px solid #ffe4e6",
-                    printColorAdjust: "exact",
-                    WebkitPrintColorAdjust: "exact"
+                    width: '380px',
+                    maxWidth: '100%',
+                    background: globalTheme === 'dark' ? '#1a1614' : '#fffaf5',
+                    padding: '32px',
+                    position: 'relative',
+                    overflow: 'hidden',
+                    textAlign: 'center',
+                    flexShrink: 0,
+                    boxShadow: '0 25px 50px -12px rgba(244, 63, 94, 0.25)',
+                    borderRadius: '1.5rem',
+                    border: '8px solid #ffe4e6',
                   }}
                 >
-                  <div className="absolute inset-0 opacity-20 pointer-events-none" style={{ backgroundImage: "radial-gradient(#f43f5e 1px, transparent 1px)", backgroundSize: "20px 20px" }}></div>
-                  
-                  <div className="relative z-10 border-2 border-dashed border-rose-200 dark:border-rose-900/50 rounded-xl p-5 sm:p-6 bg-white/80 dark:bg-black/80 backdrop-blur-sm">
-                    <Heart className="w-12 h-12 text-rose-500 mx-auto mb-4 fill-rose-100 dark:fill-rose-900/30 drop-shadow-sm" />
-                    
-                    <h3 className="text-2xl sm:text-3xl font-black text-rose-600 dark:text-rose-400 mb-2 font-serif tracking-tight">CERTIFICATE</h3>
-                    <div className="text-[10px] sm:text-xs tracking-[0.2em] text-zinc-400 uppercase mb-6">of a beautiful moment</div>
-                    
-                    <p className="text-center text-zinc-600 dark:text-zinc-300 text-xs sm:text-sm leading-relaxed mb-8 italic font-serif">
-                      "This formally recognizes that on this day, a small 'yes' made something feel truly special."
+                  {/* Polka dot pattern */}
+                  <div style={{
+                    position: 'absolute',
+                    inset: 0,
+                    opacity: 0.15,
+                    pointerEvents: 'none',
+                    backgroundImage: 'radial-gradient(#f43f5e 1.5px, transparent 1.5px)',
+                    backgroundSize: '20px 20px',
+                  }} />
+
+                  {/* Inner dashed panel */}
+                  <div style={{
+                    position: 'relative',
+                    zIndex: 10,
+                    border: '2px dashed #fecdd3',
+                    borderRadius: '12px',
+                    padding: '24px',
+                    background: globalTheme === 'dark' ? 'rgba(0,0,0,0.85)' : 'rgba(255,255,255,0.92)',
+                  }}>
+                    {/* Heart icon */}
+                    <div style={{ marginBottom: '16px' }}>
+                      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ margin: '0 auto' }}>
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" fill="#ffe4e6" stroke="#f43f5e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </div>
+
+                    {/* Title */}
+                    <h3 style={{
+                      fontSize: '28px',
+                      fontWeight: 900,
+                      color: globalTheme === 'dark' ? '#fb7185' : '#e11d48',
+                      marginBottom: '4px',
+                      letterSpacing: '-0.5px',
+                      fontFamily: 'Georgia, serif',
+                    }}>CERTIFICATE</h3>
+                    <div style={{
+                      fontSize: '10px',
+                      letterSpacing: '0.2em',
+                      color: '#a1a1aa',
+                      textTransform: 'uppercase',
+                      marginBottom: '24px',
+                    }}>of a beautiful moment</div>
+
+                    {/* Quote */}
+                    <p style={{
+                      color: globalTheme === 'dark' ? '#d4d4d8' : '#52525b',
+                      fontSize: '13px',
+                      lineHeight: '1.6',
+                      marginBottom: '24px',
+                      fontStyle: 'italic',
+                      fontFamily: 'Georgia, serif',
+                    }}>
+                      &ldquo;This formally recognizes that on this day, a small &lsquo;yes&rsquo; made something feel truly special.&rdquo;
                     </p>
-                    
-                    <div className="space-y-4 text-left">
-                      <div>
-                        <span className="block text-[10px] text-zinc-400 font-bold uppercase tracking-widest mb-1">Awarded To</span>
-                        <div className="font-serif text-lg sm:text-xl font-bold text-zinc-800 dark:text-zinc-100 border-b-2 border-rose-100 dark:border-rose-900/50 pb-1">
+
+                    {/* Fields */}
+                    <div style={{ textAlign: 'left' }}>
+                      <div style={{ marginBottom: '16px' }}>
+                        <span style={{ display: 'block', fontSize: '10px', color: '#a1a1aa', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: '4px' }}>
+                          Awarded To
+                        </span>
+                        <div style={{
+                          fontFamily: 'Georgia, serif',
+                          fontSize: '20px',
+                          fontWeight: 700,
+                          color: globalTheme === 'dark' ? '#f4f4f5' : '#27272a',
+                          borderBottom: '2px solid #ffe4e6',
+                          paddingBottom: '4px',
+                        }}>
                           {enteredName || data.receiverName}
                         </div>
                       </div>
-                      
+
                       {data.senderName && (
-                        <div>
-                          <span className="block text-[10px] text-zinc-400 font-bold uppercase tracking-widest mb-1">With Love From</span>
-                          <div className="font-serif text-md sm:text-lg font-bold text-zinc-800 dark:text-zinc-100 border-b-2 border-rose-100 dark:border-rose-900/50 pb-1">
+                        <div style={{ marginBottom: '16px' }}>
+                          <span style={{ display: 'block', fontSize: '10px', color: '#a1a1aa', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: '4px' }}>
+                            With Love From
+                          </span>
+                          <div style={{
+                            fontFamily: 'Georgia, serif',
+                            fontSize: '18px',
+                            fontWeight: 700,
+                            color: globalTheme === 'dark' ? '#f4f4f5' : '#27272a',
+                            borderBottom: '2px solid #ffe4e6',
+                            paddingBottom: '4px',
+                          }}>
                             {data.senderName}
                           </div>
                         </div>
                       )}
-                      
-                      <div className="flex justify-between items-end pt-4">
+
+                      {/* Date + seal row */}
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', paddingTop: '16px' }}>
                         <div>
-                          <span className="block text-[10px] text-zinc-400 font-bold uppercase tracking-widest mb-1">Date</span>
-                          <div className="font-mono text-xs sm:text-sm font-semibold text-rose-500" suppressHydrationWarning>
+                          <span style={{ display: 'block', fontSize: '10px', color: '#a1a1aa', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: '4px' }}>
+                            Date
+                          </span>
+                          <div style={{ fontFamily: 'monospace', fontSize: '13px', fontWeight: 600, color: '#f43f5e' }} suppressHydrationWarning>
                             {mounted ? new Date().toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }) : '--/--/----'}
-                            {mounted && <span className="ml-2 opacity-50">{new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</span>}
+                            {mounted && <span style={{ marginLeft: '8px', opacity: 0.5 }}>{new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</span>}
                           </div>
                         </div>
-                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 border-rose-200 flex items-center justify-center opacity-50">
-                          <Heart className="w-5 h-5 sm:w-6 sm:h-6 text-rose-300" />
+                        {/* Wax seal */}
+                        <div style={{
+                          width: '44px',
+                          height: '44px',
+                          borderRadius: '50%',
+                          border: '2px solid #fecdd3',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          opacity: 0.5,
+                        }}>
+                          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" stroke="#fda4af" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
                         </div>
                       </div>
                     </div>
@@ -347,15 +455,15 @@ export default function ReceiverPage() {
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-3 mt-8 w-full max-w-[380px] print:hidden">
-                  <button 
+                  <button
                     onClick={handleDownload}
                     className="flex-1 flex items-center justify-center gap-2 py-4 bg-rose-500 hover:bg-rose-600 text-white rounded-2xl font-bold shadow-lg shadow-rose-500/20 transition-all active:scale-95 disabled:opacity-50"
                     disabled={loading}
                   >
                     <Camera className="w-5 h-5" /> {loading ? 'Saving...' : 'Save as Image'}
                   </button>
-                  <Link 
-                    href="/" 
+                  <Link
+                    href="/"
                     className="flex-1 flex items-center justify-center gap-2 py-4 bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 rounded-2xl font-bold shadow-sm transition-all active:scale-95"
                   >
                     <X className="w-5 h-5" /> Close
