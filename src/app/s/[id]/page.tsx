@@ -125,10 +125,10 @@ export default function ReceiverPage() {
       // Temporarily disable backdrop-filter (unsupported by html-to-image)
       const innerPanel = node.querySelector<HTMLElement>('.backdrop-blur-sm');
       const prevBackdrop = innerPanel?.style.backdropFilter ?? '';
-      const prevWebkitBackdrop = innerPanel?.style.webkitBackdropFilter ?? '';
+      const prevWebkitBackdrop = (innerPanel?.style as any).webkitBackdropFilter ?? '';
       if (innerPanel) {
         innerPanel.style.backdropFilter = 'none';
-        innerPanel.style.webkitBackdropFilter = 'none';
+        (innerPanel.style as any).webkitBackdropFilter = 'none';
         innerPanel.style.backgroundColor = globalTheme === 'dark' ? 'rgba(0,0,0,0.9)' : 'rgba(255,255,255,0.95)';
       }
 
@@ -143,7 +143,7 @@ export default function ReceiverPage() {
       // Restore styles
       if (innerPanel) {
         innerPanel.style.backdropFilter = prevBackdrop;
-        innerPanel.style.webkitBackdropFilter = prevWebkitBackdrop;
+        (innerPanel.style as any).webkitBackdropFilter = prevWebkitBackdrop;
         innerPanel.style.backgroundColor = '';
       }
 
