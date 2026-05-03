@@ -1,4 +1,8 @@
+<div align="center">
+
 # Just For You 💖
+<img width="4096" height="2728" alt="just-for-you poster" src="https://github.com/user-attachments/assets/246a58ab-a2d2-49ab-84c3-ada16d4d6e66" />
+
 
 An interactive, premium surprise platform designed to create personalized, animated messages for your special someone.
 
